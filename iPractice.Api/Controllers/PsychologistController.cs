@@ -39,7 +39,7 @@ namespace iPractice.Api.Controllers
         /// <param name="psychologistId">The ID of the psychologist.</param>
         /// <returns>A list of availability blocks.</returns>
         [HttpGet("{psychologistId}/availabilities")]
-        public async Task<ActionResult<AvailabilityResponse>> GetAvailabilities(long psychologistId)
+        public async Task<ActionResult> GetAvailabilities(long psychologistId)
         {
             try
             {
