@@ -33,13 +33,11 @@ namespace iPractice.DataAccess
 
             modelBuilder.Entity<Booking>()
                 .HasOne(booking => booking.Client)
-                .WithMany(client => client.Bookings)
-                .HasForeignKey(booking => booking.ClientId);
+                .WithMany(client => client.Bookings);
 
             modelBuilder.Entity<Booking>()
                 .HasOne<Psychologist>(booking => booking.Psychologist)
-                .WithMany(psychologist => psychologist.Bookings)
-                .HasForeignKey(booking => booking.PsychologistId);
+                .WithMany(psychologist => psychologist.Bookings);
         }
     }
 }

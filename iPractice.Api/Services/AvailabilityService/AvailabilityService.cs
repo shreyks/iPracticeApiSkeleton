@@ -30,11 +30,6 @@ namespace iPractice.Api.Services
             _context = context;
         }
 
-        public async Task<bool> ClientExists(long clientId)
-        {
-            return await _context.Clients.AnyAsync(c => c.Id == clientId);
-        }
-
         public async Task<AvailabilityResponse> GetAvailabilitiesForPsychologist(long psychologistId)
         {
 
@@ -51,7 +46,7 @@ namespace iPractice.Api.Services
             // Check if Client exists and raise an exception accordingly.
 
             // Fetch with psychologistId as foreign key.
-            List<Availability> availableSlots = await GetAvailabilitiesForPsychologistFromDb(clientId);
+            List<Availability> availableSlots = await GetAvailabilitiesForClientFromDb(clientId);
             return new AvailabilityResponse(availableSlots);
         }
 
@@ -106,6 +101,7 @@ namespace iPractice.Api.Services
             List<Availability> availabilities = await _context.AvailableSlots
                 .Include(x => x.Psychologist)
                 .Where(x => psychologystIds.Any(id => id == x.Psychologist.Id))
+                .Where(availability => !availability.IsBooked)
                 .ToListAsync();
 
             return availabilities;
@@ -116,7 +112,8 @@ namespace iPractice.Api.Services
             // Fetch with psychologistId as foreign key.
             return await _context.AvailableSlots
                                     .Include(psych => psych.Psychologist)
-                                    .Where(availability => availability.Psychologist.Id == psychologistId)
+                                    .Where(availability => availability.Psychologist.Id == psychologistId 
+                                        && !availability.IsBooked)
                                     .ToListAsync();
         }
 

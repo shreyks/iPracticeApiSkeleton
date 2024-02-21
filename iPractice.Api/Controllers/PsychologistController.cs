@@ -60,13 +60,13 @@ namespace iPractice.Api.Controllers
         }
 
         /// <summary>
-        /// Add a block of time during which the psychologist is available during normal business hours
+        /// Add a block of time during which the psychologist is available during normal business hours.
         /// </summary>
         /// <param name="psychologistId"></param>
         /// <param name="availability">Availability</param>
         /// <returns>Ok if the availability was created</returns>
         [HttpPost("{psychologistId}/availability")]
-        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(AvailabilityResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult<AvailabilityResponse>> CreateAvailability([FromRoute] long psychologistId, [FromBody] TimeSlot timeSlot)
         {

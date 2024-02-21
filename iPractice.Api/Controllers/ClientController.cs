@@ -18,11 +18,13 @@ namespace iPractice.Api.Controllers
     {
         private readonly ILogger<ClientController> _logger;
         private readonly IAvailabilityService _availabilityService;
+        private readonly IBookingService _bookingService;
 
-        public ClientController(ILogger<ClientController> logger, IAvailabilityService availabilityService)
+        public ClientController(ILogger<ClientController> logger, IAvailabilityService availabilityService, IBookingService bookingService)
         {
             _logger = logger;
             _availabilityService = availabilityService;
+            _bookingService = bookingService;
         }
         
         /// <summary>
@@ -32,13 +34,13 @@ namespace iPractice.Api.Controllers
         /// <param name="clientId">The client ID</param>
         /// <returns>All time slots for the selected client</returns>
         [HttpGet("{clientId}/timeslots")]
-        [ProducesResponseType(typeof(IEnumerable<TimeSlot>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<TimeSlot>>> GetAvailableTimeSlots(long clientId)
         {
             try
             {
                 var availabilities = await _availabilityService.GetAvailabilitiesForClient(clientId);
-                return Ok(availabilities);
+                return Ok( availabilities);
+
             }
             catch (PsychologistAbsentException ex)
             {
@@ -62,9 +64,30 @@ namespace iPractice.Api.Controllers
         [HttpPost("{clientId}/appointment")]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult> CreateAppointment(long clientId, [FromBody] TimeSlot timeSlot)
+        public async Task<ActionResult> CreateAppointment(long clientId, long psychologistId, [FromBody] TimeSlot timeSlot)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var bookingDetails = await _bookingService.CreateBooking(clientId, psychologistId, timeSlot);
+                if (bookingDetails)
+                {
+                    return Ok("Booking succesfull.");
+                }
+                else
+                    return BadRequest("Booking Failed.");             
+
+            }
+            catch (PsychologistUnavailableExcpetion ex)
+            {
+                // Log the exception details
+                _logger.LogError(ex.Message);
+                return BadRequest("Internal server error: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching availabilities.");
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
     }
 }
