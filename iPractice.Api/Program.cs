@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using iPractice.DataAccess;
 using Microsoft.AspNetCore.Hosting;
@@ -13,6 +14,7 @@ namespace iPractice.Api
         {
             var webHost = CreateHostBuilder(args).Build();
 
+            Console.WriteLine("Seeding starting.");
             await InitializeDatabase(webHost);
 
             await webHost.RunAsync();
@@ -27,6 +29,8 @@ namespace iPractice.Api
 
                 var seedData = new SeedData(context);
                 seedData.Seed();
+
+                Console.WriteLine("Seeding completed.");
 
             }
         }

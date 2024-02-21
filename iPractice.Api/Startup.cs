@@ -1,3 +1,4 @@
+using iPractice.Api.Services;
 using iPractice.DataAccess;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -29,11 +30,11 @@ namespace iPractice.Api
                     Title = " iPractice APIs"
                 });
 
-
             });
             
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("Sqlite")));
-
+            services.AddScoped<IAvailabilityService, AvailabilityService>();
+            services.AddScoped<IBookingService, BookingService>();
             services.AddControllers();
         }
 
@@ -48,9 +49,7 @@ namespace iPractice.Api
             }
 
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

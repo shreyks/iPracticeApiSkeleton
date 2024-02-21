@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using iPractice.Api.Models;
+using iPractice.Api.Models.Exception;
+using iPractice.Api.Services;
+using iPractice.DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace iPractice.Api.Controllers
@@ -13,10 +17,12 @@ namespace iPractice.Api.Controllers
     public class ClientController : ControllerBase
     {
         private readonly ILogger<ClientController> _logger;
-        
-        public ClientController(ILogger<ClientController> logger)
+        private readonly IAvailabilityService _availabilityService;
+
+        public ClientController(ILogger<ClientController> logger, IAvailabilityService availabilityService)
         {
             _logger = logger;
+            _availabilityService = availabilityService;
         }
         
         /// <summary>
@@ -29,7 +35,22 @@ namespace iPractice.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<TimeSlot>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<TimeSlot>>> GetAvailableTimeSlots(long clientId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var availabilities = await _availabilityService.GetAvailabilitiesForClient(clientId);
+                return Ok(availabilities);
+            }
+            catch (PsychologistAbsentException ex)
+            {
+                // Log the exception details
+                _logger.LogError(ex.Message);
+                return BadRequest("Internal server error: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching availabilities.");
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
 
         /// <summary>
