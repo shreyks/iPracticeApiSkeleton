@@ -14,3 +14,6 @@ Open the project and click `Start` to host the server on	`localhost`.
 	 - If the timeslot is unavailable or already booked for that psychologist, error is raised for unavailable psychologist.
  - Fetching availabilities using `clientId` and `psychologistId` are both implemented.
 
+ ## To Do
+ - Separation of concerns to move all DB access functions to a different layer from the service layers, added to the DataAccess project. 
+ - Separation of DB queries from the Booking service to a separate layer in the DataAccessProject.
