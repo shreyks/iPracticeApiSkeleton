@@ -17,3 +17,4 @@ Open the project and click `Start` to host the server on	`localhost`.
  ## To Do
  - Separation of concerns to move all DB access functions to a different layer from the service layers, added to the DataAccess project. 
  - Separation of DB queries from the Booking service to a separate layer in the DataAccessProject.
+ - Create a data transfer object type for internal usage in the service layer.
