@@ -9,10 +9,10 @@ namespace iPractice.Api.Models.ApiVersion1.ResponseModels
 {
     public class AvailabilityResponse
     {
-        public List<TimeSlot> AvailableSlots { get; set; }
-        public AvailabilityResponse(List<Availability> availabilities)
+        public List<TimeSlot> AvailableTimeSlots { get; set; }
+        public AvailabilityResponse(List<Availability> availableTimeSlots)
         {
-            AvailableSlots = availabilities.Select(a => new TimeSlot { StartTimeSlot = a.StartTimeSlot, EndTimeSlot = a.EndTimeSlot }).ToList();
+            AvailableTimeSlots = (List<TimeSlot>)availableTimeSlots.Select(a => new TimeSlot(a.StartTimeSlot, a.EndTimeSlot));
         }
     }
 }

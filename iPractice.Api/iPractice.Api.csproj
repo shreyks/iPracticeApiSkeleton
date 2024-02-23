@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\NewFolder\" />
     <Folder Include="Services\NewFolder1\" />
     <Folder Include="Services\NewFolder\NewFolder\" />
   </ItemGroup>

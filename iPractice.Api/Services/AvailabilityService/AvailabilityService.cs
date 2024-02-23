@@ -65,7 +65,7 @@ namespace iPractice.Api.Services
             while (startTime < endTime)
             {
                 DateTime intervalEnd = startTime.AddMinutes(30) > endTime ? endTime : startTime.AddMinutes(30);
-                TimeSlot intervalTimeSlot = new TimeSlot { StartTimeSlot = startTime, EndTimeSlot = intervalEnd };
+                TimeSlot intervalTimeSlot = new TimeSlot(startTime, intervalEnd);
 
                 // Add the interval time slot to the database.
                 var addedAvailabilty = await this.AddAvailabilityToDb(intervalTimeSlot, psychologistId);
