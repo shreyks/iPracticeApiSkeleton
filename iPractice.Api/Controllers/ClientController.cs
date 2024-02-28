@@ -9,6 +9,7 @@ using iPractice.DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using TimeSlot = iPractice.Api.Models.TimeSlot;
 
 namespace iPractice.Api.Controllers
 {
@@ -68,7 +69,8 @@ namespace iPractice.Api.Controllers
         {
             try
             {
-                var bookingDetails = await _bookingService.CreateBooking(clientId, psychologistId, timeSlot);
+                DataAccess.Models.TimeSlot dataAccessTimeSlot = new iPractice.DataAccess.Models.TimeSlot(timeSlot.StartTimeSlot, timeSlot.EndTimeSlot);
+                var bookingDetails = await _bookingService.CreateBooking(clientId, psychologistId, dataAccessTimeSlot);
                 if (bookingDetails)
                 {
                     return Ok("Booking succesfull.");

@@ -3,6 +3,7 @@ using iPractice.Api.Models;
 using iPractice.Api.Models.ApiVersion1.ResponseModels;
 using iPractice.Api.Models.Exception;
 using iPractice.DataAccess;
+using iPractice.DataAccess.DbAccessLayer;
 using iPractice.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TimeSlot = iPractice.Api.Models.TimeSlot;
 
 namespace iPractice.Api.Services
 {
@@ -22,22 +24,22 @@ namespace iPractice.Api.Services
     {
 
         ILogger<AvailabilityService> _logger;
-        private readonly ApplicationDbContext _context;
+        private readonly IAvailabilityDbAccess _availabilityDbAccess;
 
-        public AvailabilityService(ILogger<AvailabilityService> logger, ApplicationDbContext context)
+        public AvailabilityService(ILogger<AvailabilityService> logger, IAvailabilityDbAccess availabilityDbAccess)
         {
             _logger = logger;
-            _context = context;
+            _availabilityDbAccess = availabilityDbAccess;
         }
 
         public async Task<AvailabilityResponse> GetAvailabilitiesForPsychologist(long psychologistId)
         {
 
-            bool psychologistExists = await this.PsychologistExistsInDb(psychologistId);
+            bool psychologistExists = await _availabilityDbAccess.PsychologistExistsInDb(psychologistId);
             if (!psychologistExists)
                 throw new PsychologistAbsentException();
             // Fetch with psychologistId as foreign key.
-            List<Availability> availableSlots = await GetAvailabilitiesForPsychologistFromDb(psychologistId);
+            List<Availability> availableSlots = await _availabilityDbAccess.GetAvailabilitiesForPsychologistFromDb(psychologistId);
             return new AvailabilityResponse(availableSlots);
         }
 
@@ -46,13 +48,13 @@ namespace iPractice.Api.Services
             // Check if Client exists and raise an exception accordingly.
 
             // Fetch with psychologistId as foreign key.
-            List<Availability> availableSlots = await GetAvailabilitiesForClientFromDb(clientId);
+            List<Availability> availableSlots = await _availabilityDbAccess.GetAvailabilitiesForClientFromDb(clientId);
             return new AvailabilityResponse(availableSlots);
         }
 
         public async Task<AvailabilityResponse> AddAvailability( long psychologistId, TimeSlot timeSlot)
         {
-            bool psychologistExists = await this.PsychologistExistsInDb(psychologistId);
+            bool psychologistExists = await _availabilityDbAccess.PsychologistExistsInDb(psychologistId);
             if (!psychologistExists)
                 throw new PsychologistAbsentException();
 
@@ -65,10 +67,10 @@ namespace iPractice.Api.Services
             while (startTime < endTime)
             {
                 DateTime intervalEnd = startTime.AddMinutes(30) > endTime ? endTime : startTime.AddMinutes(30);
-                TimeSlot intervalTimeSlot = new TimeSlot(startTime, intervalEnd);
+                iPractice.DataAccess.Models.TimeSlot intervalTimeSlot = new iPractice.DataAccess.Models.TimeSlot(startTime, intervalEnd);
 
                 // Add the interval time slot to the database.
-                var addedAvailabilty = await this.AddAvailabilityToDb(intervalTimeSlot, psychologistId);
+                var addedAvailabilty = await _availabilityDbAccess.AddAvailabilityToDb(intervalTimeSlot, psychologistId);
 
                 availableSlots.Add(addedAvailabilty);
                 // Move to the next interval.
@@ -83,61 +85,6 @@ namespace iPractice.Api.Services
             // Make a DeleteAvailabilityFromDb() function that erases the
             // availability data row that matches the id.
             throw new NotImplementedException();
-        }
-
-
-        private async Task<List<Availability>> GetAvailabilitiesForClientFromDb(long clientId)
-        {
-            var client = await _context.Clients
-                .Include(x => x.Psychologists)
-                .FirstOrDefaultAsync(x => x.Id == clientId);
-
-            if (client.Psychologists == null || !client.Psychologists.Any())
-            {
-                return new List<Availability>();
-            }
-            var psychologystIds = client.Psychologists.Select(x => x.Id).ToList();
-
-            List<Availability> availabilities = await _context.AvailableSlots
-                .Include(x => x.Psychologist)
-                .Where(x => psychologystIds.Any(id => id == x.Psychologist.Id))
-                .Where(availability => !availability.IsBooked)
-                .ToListAsync();
-
-            return availabilities;
-        }
-
-        private async Task<List<Availability>> GetAvailabilitiesForPsychologistFromDb(long psychologistId)
-        {
-            // Fetch with psychologistId as foreign key.
-            return await _context.AvailableSlots
-                                    .Include(psych => psych.Psychologist)
-                                    .Where(availability => availability.Psychologist.Id == psychologistId 
-                                        && !availability.IsBooked)
-                                    .ToListAsync();
-        }
-
-        private async Task<bool> PsychologistExistsInDb(long psychologistId)
-        {
-            return await _context.Psychologists.AnyAsync(p => p.Id == psychologistId);
-        }
-
-        private async Task<Availability> AddAvailabilityToDb(TimeSlot timeSlot, long psychologistId)
-        {
-            var psych = _context.Psychologists.FirstOrDefault(p => p.Id == psychologistId);
-            var availability = new Availability(timeSlot.StartTimeSlot, timeSlot.EndTimeSlot, psych);
-
-            // Check if an Availability record already exists for this psychologist and time
-            var exists = await _context.AvailableSlots
-                                      .AnyAsync(a => a.Psychologist.Id == psychologistId && a.StartTimeSlot == timeSlot.StartTimeSlot);
-
-            if(!exists)
-            {
-                await _context.AvailableSlots.AddAsync(availability);
-            }
-
-            await _context.SaveChangesAsync();
-            return availability;
         }
     }
 }

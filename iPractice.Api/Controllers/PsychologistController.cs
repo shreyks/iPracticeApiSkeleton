@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using iPractice.Api.Models;
 using iPractice.Api.Models.Exception;
 using iPractice.Api.Models.ApiVersion1.ResponseModels;
+using TimeSlot = iPractice.Api.Models.TimeSlot;
 
 namespace iPractice.Api.Controllers
 {

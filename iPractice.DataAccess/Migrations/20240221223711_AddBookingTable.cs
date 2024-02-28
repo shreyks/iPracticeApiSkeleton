@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace iPractice.DataAccess.Migrations
 {
-    public partial class AddBookingsTable : Migration
+    public partial class AddBookingTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -61,10 +61,10 @@ namespace iPractice.DataAccess.Migrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    PsychologistId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ClientId = table.Column<long>(type: "INTEGER", nullable: false),
                     StartTimeSlot = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    EndTimeSlot = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    EndTimeSlot = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    PsychologistId = table.Column<long>(type: "INTEGER", nullable: true),
+                    ClientId = table.Column<long>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -74,13 +74,13 @@ namespace iPractice.DataAccess.Migrations
                         column: x => x.ClientId,
                         principalTable: "Clients",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Bookings_Psychologists_PsychologistId",
                         column: x => x.PsychologistId,
                         principalTable: "Psychologists",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(

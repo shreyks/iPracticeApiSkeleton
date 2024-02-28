@@ -2,17 +2,15 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using iPractice.DataAccess;
 
 namespace iPractice.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240221211610_AddBookingsTable")]
-    partial class AddBookingsTable
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,13 +62,13 @@ namespace iPractice.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("ClientId")
+                    b.Property<long?>("ClientId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("EndTimeSlot")
                         .HasColumnType("TEXT");
 
-                    b.Property<long>("PsychologistId")
+                    b.Property<long?>("PsychologistId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("StartTimeSlot")
@@ -141,15 +139,11 @@ namespace iPractice.DataAccess.Migrations
                 {
                     b.HasOne("iPractice.DataAccess.Models.Client", "Client")
                         .WithMany("Bookings")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClientId");
 
                     b.HasOne("iPractice.DataAccess.Models.Psychologist", "Psychologist")
                         .WithMany("Bookings")
-                        .HasForeignKey("PsychologistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PsychologistId");
 
                     b.Navigation("Client");
 

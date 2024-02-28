@@ -1,5 +1,6 @@
 using iPractice.Api.Services;
 using iPractice.DataAccess;
+using iPractice.DataAccess.DbAccessLayer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -31,10 +32,12 @@ namespace iPractice.Api
                 });
 
             });
-            
+
+
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("Sqlite")));
             services.AddScoped<IAvailabilityService, AvailabilityService>();
             services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<IAvailabilityDbAccess, AvailabilityDbAccess>();
             services.AddControllers();
         }
 

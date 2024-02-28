@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using TimeSlot = iPractice.Api.Models.TimeSlot;
 
 namespace iPractice.Api.Tests.Controllers
 {

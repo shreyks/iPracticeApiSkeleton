@@ -6,6 +6,7 @@ using iPractice.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using TimeSlot = iPractice.DataAccess.Models.TimeSlot;
 
 namespace iPractice.Api.Services
 {

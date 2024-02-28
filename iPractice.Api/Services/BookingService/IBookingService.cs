@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using iPractice.Api.Models;
 using iPractice.Api.Models.ApiVersion1.ResponseModels;
 using iPractice.DataAccess.Models;
+using TimeSlot = iPractice.DataAccess.Models.TimeSlot;
 
 namespace iPractice.Api.Services
 {
